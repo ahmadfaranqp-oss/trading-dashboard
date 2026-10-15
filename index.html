@@ -1,0 +1,64 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Trading Live</title><link rel="manifest" href="manifest.json"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="Trading Live"><meta name="theme-color" content="#16a34a"><link rel="apple-touch-icon" href="icon-192.png"><style>
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,Segoe UI,Roboto,sans-serif;background:#f4f5fb;color:#1d1f2b}
+.wrap{max-width:460px;margin:auto;padding:14px}
+.hero{border-radius:26px;padding:20px;background:linear-gradient(135deg,#e7f6ee 0%,#eef0ff 45%,#fde9f1 100%);box-shadow:0 6px 24px #0000000d}
+.lbl{font-size:12px;color:#7a7f93;text-transform:uppercase;letter-spacing:.06em}
+.big{font-size:40px;font-weight:800;color:#16a34a;margin:4px 0}.chg{font-weight:700}
+.pos{color:#16a34a}.neg{color:#dc2626}.muted{color:#9aa0b4}
+.card{background:#fff;border-radius:22px;padding:16px;margin-top:14px;box-shadow:0 4px 18px #0000000a}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px}.h{font-weight:700;font-size:15px}
+.pill{font-size:11px;padding:3px 9px;border-radius:99px;background:#eef0ff;color:#4f46e5;font-weight:600}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px}.grid div{background:#f7f8fc;border-radius:12px;padding:8px}
+.grid b{display:block;font-size:14px}.strip{display:flex;gap:8px;overflow-x:auto;margin-top:10px}
+.chip{min-width:130px;border-radius:16px;padding:10px;background:#f7f8fc}.chip b{font-size:17px}
+svg{width:100%;display:block}.foot{text-align:center;font-size:11px;color:#9aa0b4;margin:14px 0 30px}
+</style></head><body><div class="wrap">
+<div class="hero"><div class="row"><span class="lbl">Equity · TradingView Paper</span><span class="pill" id="live">LIVE</span></div>
+<div class="big" id="eq">–</div><div><span class="chg" id="chg">–</span> <span class="muted">heute</span></div>
+<svg id="spark" viewBox="0 0 300 60" height="60"></svg>
+<div class="grid"><div><span class="lbl">Balance</span><b id="bal">–</b></div><div><span class="lbl">Unreal.</span><b id="up">–</b></div><div><span class="lbl">Trades</span><b id="tr">–</b></div></div></div>
+<div class="card"><div class="row"><span class="h" id="ptitle">Position</span><span class="pill" id="pstat">–</span></div>
+<div class="muted" style="font-size:13px;margin-top:4px" id="pinfo"></div>
+<svg id="cdl" viewBox="0 0 320 170" height="170"></svg><div class="muted" style="font-size:11px" id="csrc"></div></div>
+<div class="card"><div class="row"><span class="h">Jeder Close</span><span class="pill" id="wr">–</span></div><svg id="lolli" viewBox="0 0 320 120" height="120"></svg></div>
+<div class="card"><span class="h">Große Closes</span><div class="strip" id="strip"></div></div>
+<div class="card"><span class="h">Live-Kurse</span><div class="grid" id="px"></div></div>
+<div class="card"><span class="h">So arbeitet das Team</span><div style="font-size:13px;line-height:1.5;margin-top:6px">
+Analyst (15 Min) → News (30 Min) → Signalgeber → Risikomanager (Veto) → Ausführer → Auditor (stündlich).<br>
+Regeln: max. 1 % Risiko/Trade · Hebel ≤ 3x · max. 2 Positionen · CRV ≥ 2:1 · immer Stop-Loss · max. 6 Trades/Tag · 2 Verluste in Folge = 1 h Pause · 3 % Tagesverlust = Stopp · Sperre 12:00–13:00 UTC (PPI).
+<br><span class="muted">Startkapital 100.000 USD (rückgerechnet, nicht belegt). Simulation, keine Finanzberatung.</span></div></div>
+<div class="foot">zuletzt aktualisiert: <span id="upd">–</span> UTC · Daten: journal.md + Live-Kurse</div></div>
+<script>
+const $=id=>document.getElementById(id),NA='keine Daten';
+const f=(v,d=2)=>v==null?NA:v.toLocaleString('de-DE',{minimumFractionDigits:d,maximumFractionDigits:d});
+const sg=v=>v==null?NA:(v>=0?'+':'')+f(v);const cl=v=>v==null?'muted':v>=0?'pos':'neg';
+function spark(c){const s=$('spark');if(!c||c.length<2){s.innerHTML='<text x="150" y="35" text-anchor="middle" fill="#9aa0b4" font-size="12">keine Daten</text>';return}
+const v=c.map(x=>x[1]),mn=Math.min(...v),mx=Math.max(...v),r=mx-mn||1;
+const p=v.map((y,i)=>`${i/(v.length-1)*300},${55-(y-mn)/r*50}`).join(' ');
+s.innerHTML=`<polyline points="${p}" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linejoin="round"/>`}
+function candles(d){const s=$('cdl'),k=d.candles,o=d.focus;if(!k||!k.length){s.innerHTML='<text x="160" y="85" text-anchor="middle" fill="#9aa0b4">keine Daten</text>';return}
+let lv=[];if(o){lv=[[o.entry??o.price,'#4f46e5','Entry'],[o.sl,'#dc2626','SL'],[o.tp,'#16a34a','TP']]}
+const all=k.flatMap(c=>[c[2],c[3]]).concat(lv.map(l=>l[0]).filter(x=>x!=null));const mn=Math.min(...all),mx=Math.max(...all),r=mx-mn||1;
+const Y=v=>160-(v-mn)/r*150,w=270/k.length;let h='';
+k.forEach((c,i)=>{const x=i*w+w/2,up=c[4]>=c[1],col=up?'#16a34a':'#dc2626';
+h+=`<line x1="${x}" x2="${x}" y1="${Y(c[2])}" y2="${Y(c[3])}" stroke="${col}"/><rect x="${x-w*.35}" y="${Y(Math.max(c[1],c[4]))}" width="${w*.7}" height="${Math.max(1,Math.abs(Y(c[1])-Y(c[4])))}" fill="${col}" rx="1"/>`});
+lv.forEach(([v,c,n])=>{if(v==null)return;h+=`<line x1="0" x2="272" y1="${Y(v)}" y2="${Y(v)}" stroke="${c}" stroke-dasharray="4 3"/><text x="275" y="${Y(v)+4}" font-size="10" fill="${c}">${n} ${f(v,0)}</text>`});
+s.innerHTML=h;$('csrc').textContent=d.candles_src||''}
+function lolli(c){const s=$('lolli');if(!c.length){s.innerHTML='<text x="160" y="60" text-anchor="middle" fill="#9aa0b4">keine Daten</text>';return}
+const m=Math.max(...c.map(x=>Math.abs(x.pnl)))||1,w=300/c.length;let h='<line x1="0" x2="320" y1="60" y2="60" stroke="#e5e7ef"/>';
+c.forEach((t,i)=>{const x=10+i*w+w/2,y=60-t.pnl/m*38,col=t.pnl>=0?'#16a34a':'#dc2626';h+=`<line x1="${x}" x2="${x}" y1="60" y2="${y}" stroke="${col}" stroke-width="3"/><circle cx="${x}" cy="${y}" r="7" fill="${col}"/><text x="${x}" y="${t.pnl>=0?y-11:y+19}" text-anchor="middle" font-size="10">${sg(t.pnl)}</text>`});s.innerHTML=h}
+function render(d){$('eq').textContent=d.equity==null?NA:f(d.equity)+' $';const c=$('chg');c.textContent=sg(d.day_pnl)+(d.day_pnl!=null&&d.day_start_balance?` (${sg(d.day_pnl/d.day_start_balance*100)} %)`:'');c.className='chg '+cl(d.day_pnl);
+$('bal').textContent=f(d.balance);$('up').textContent=sg(d.unrealized);$('up').className=cl(d.unrealized);$('tr').textContent=`${d.trades_today}/${d.max_trades}`;
+spark(d.equity_curve);const o=d.focus;
+if(o){const isPos=d.positions.length>0;$('ptitle').textContent=`${o.symbol} ${o.side}`;$('pstat').textContent=isPos?'OFFEN':o.status==='Working'?'ORDER WORKING':o.status;
+$('pinfo').innerHTML=isPos?`${o.qty} @ ${f(o.entry)} · Kurs ${f(o.last)} · P/L <b class="${cl(o.upnl)}">${sg(o.upnl)} $</b>`:`Buy Limit ${o.qty} @ ${f(o.price)} · SL ${f(o.sl)} · TP ${f(o.tp)} · GTD ${o.gtd_utc.slice(11)} UTC<br>Kurs ${f(o.last)} · Abstand zum Limit ${sg(o.dist)}`}
+else{$('ptitle').textContent='Keine Position';$('pstat').textContent='FLAT';$('pinfo').textContent='Keine offene Position oder Order'}
+candles(d);lolli(d.closed);$('wr').textContent='Trefferquote '+(d.win_rate==null?NA:d.win_rate+' %');
+$('strip').innerHTML=[...d.closed].sort((a,b)=>Math.abs(b.pnl)-Math.abs(a.pnl)).map(t=>`<div class="chip"><div class="muted" style="font-size:11px">${t.symbol}</div><b class="${cl(t.pnl)}">${sg(t.pnl)} $</b><div class="muted" style="font-size:11px">${t.side} ${t.exit_type} · ${t.time_utc.slice(11,16)} UTC</div></div>`).join('')||`<span class="muted">${NA}</span>`;
+$('px').innerHTML=Object.entries(d.prices).map(([k,v])=>`<div><span class="lbl">${k}</span><b>${f(v.price,k==='EURUSD'?4:2)}</b></div>`).join('');
+$('upd').textContent=d.updated_utc;
+const age=(Date.now()-Date.parse(d.updated_utc.replace(' ','T')+'Z'))/1000;$('live').textContent=age<180?'LIVE':'VERALTET';$('live').style.color=age<180?'#16a34a':'#dc2626'}
+async function load(){try{const r=await fetch('data.json?t='+Date.now(),{cache:'no-store'});render(await r.json())}catch(e){$('live').textContent='OFFLINE'}}
+load();setInterval(load,15000);
+</script></body></html>
