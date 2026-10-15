@@ -1,5 +1,5 @@
 {
- "updated_utc": "2026-10-15 16:09:40",
+ "updated_utc": "2026-10-15 16:10:46",
  "balance": 85547.33,
  "equity": 85547.33,
  "unrealized": 0,
@@ -47,7 +47,7 @@
    85547.33
   ],
   [
-   "2026-10-15 16:09",
+   "2026-10-15 16:10",
    85547.33
   ]
  ],
@@ -56,28 +56,28 @@
  "focus": null,
  "prices": {
   "GC=F": {
-   "price": 4170.4,
+   "price": 4170.7,
    "src": "Yahoo"
   },
   "CL=F": {
-   "price": 96.28,
+   "price": 96.2,
    "src": "Yahoo"
   },
   "EURUSD": {
-   "price": 1.1203,
+   "price": 1.1202,
    "src": "Yahoo"
   },
   "XAUUSD": {
-   "price": 4147.200195,
+   "price": 4146.899902,
    "src": "gold-api.com",
-   "ts": "2026-10-15T16:09:16Z"
+   "ts": "2026-10-15T16:10:15Z"
   },
   "BTCUSD": {
-   "price": 82445.63,
+   "price": 82410.35,
    "src": "Bitstamp"
   },
   "ETHUSD": {
-   "price": 2442.29,
+   "price": 2441.42,
    "src": "Bitstamp"
   }
  },
