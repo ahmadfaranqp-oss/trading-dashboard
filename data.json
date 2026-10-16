@@ -1,5 +1,5 @@
 {
- "updated_utc": "2026-10-16 10:19:24",
+ "updated_utc": "2026-10-16 10:19:57",
  "balance": 85547.33,
  "equity": 85547.33,
  "unrealized": 0,
@@ -68,16 +68,16 @@
    "src": "Yahoo"
   },
   "XAUUSD": {
-   "price": 4184.399902,
+   "price": 4184.700195,
    "src": "gold-api.com",
-   "ts": "2026-10-16T10:18:59Z"
+   "ts": "2026-10-16T10:19:29Z"
   },
   "BTCUSD": {
-   "price": 81921.4,
+   "price": 81913.55,
    "src": "Bitstamp"
   },
   "ETHUSD": {
-   "price": 2449.04,
+   "price": 2448.49,
    "src": "Bitstamp"
   }
  },
